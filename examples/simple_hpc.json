@@ -1,0 +1,73 @@
+{
+    "location": "variables.location",
+    "resource_group": "variables.resource_group",
+    "install_from": "headnode",
+    "admin_user": "hpcadmin",
+    "vnet": {
+        "name": "hpcvnet",
+        "address_prefix": "10.2.0.0/20",
+        "subnets": {
+            "compute": "10.2.0.0/22"
+        }
+    },
+    "variables": {
+        "location": "<NOT-SET>",
+        "resource_group": "<NOT-SET>",
+   	"image": "OpenLogic:CentOS-HPC:7.6:latest"
+    },
+    "resources": {
+        "headnode": {
+            "type": "vm",
+            "vm_type": "Standard_HC44rs",
+            "public_ip": true,
+            "image": "variables.image",
+            "subnet": "compute",
+            "tags": [
+                "nfsserver",
+                "loginnode",
+                "localuser",
+                "disable-selinux"
+            ]
+        },
+        "nodes": {
+            "type": "vmss",
+            "vm_type": "Standard_HC44rs",
+            "instances": 8,
+            "image": "variables.image",
+            "subnet": "compute",
+            "tags": [
+                "localuser",
+                "disable-selinux",
+		"nfsclient"
+            ]
+        }
+    },
+    "install": [
+        {
+            "script": "disable-selinux.sh",
+            "tag": "disable-selinux",
+            "sudo": true
+        },
+        {
+            "script": "nfsserver.sh",
+            "tag": "nfsserver",
+            "sudo": true
+        },
+        {
+            "script": "nfsclient.sh",
+            "args": [
+                "$(<hostlists/tags/nfsserver)"
+            ],
+            "tag": "nfsclient",
+            "sudo": true
+        },
+        {
+            "script": "localuser.sh",
+            "args": [
+                "$(<hostlists/tags/nfsserver)"
+            ],
+            "tag": "localuser",
+            "sudo": true
+        }
+    ]
+}
