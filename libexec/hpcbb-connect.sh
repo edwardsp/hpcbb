@@ -92,9 +92,9 @@ command=
 
 if [ "$switch_user" != "" ]; then
     if [ "$#" -gt "0" ]; then
-        command="sudo -u $switch_user /bin/bash -c '$@'"
+        command="sudo -u $switch_user /bin/bash -l -c 'cd ~$switch_user && exec /bin/bash -l -c "$@"'"
     else
-        command="sudo -u $switch_user"
+        command="sudo -u $switch_user /bin/bash -c 'cd ~$switch_user && exec /bin/bash'"
     fi
 else
     if [ "$#" -gt "0" ]; then
