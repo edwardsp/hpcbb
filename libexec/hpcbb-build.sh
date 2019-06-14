@@ -135,7 +135,7 @@ for resource_name in $(jq -r ".resources | keys | @tsv" $config_file); do
                 debug "$data_disks_options"
             fi
 
-            uuid_str="$(uuidgen | tr -d '\n-' | tr '[:upper:]' '[:lower:]' | cut -c 1-6)"
+            uuid_str="$(cat /proc/sys/kernel/random/uuid | tr -d '\n-' | tr '[:upper:]' '[:lower:]' | cut -c 1-6)"
             az vm create \
                 --resource-group $resource_group \
                 --name $resource_name \
